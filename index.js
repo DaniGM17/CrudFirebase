@@ -1,60 +1,85 @@
-import { saveTask, getTasks, onGetTasks, deleteTask, getTask} from './firebase.js';
+import { saveTask, getTasks, onGetTasks, deleteTask, getTask, updateTask } from './firebase.js';
 
 const taskForm = document.getElementById('task-form');
 const tasksContainer = document.getElementById('tasks-container');
 
-window.addEventListener('DOMContentLoaded', async () => {
+let editStatus = false;
+let id = "";
+
+window.addEventListener('DOMContentLoaded', async (e) => {
     onGetTasks((querySnapshot) => {
-        let html = '';
+        tasksContainer.innerHTML = '';
 
         querySnapshot.forEach((doc) => {
             const task = doc.data();
-            html += `
+            tasksContainer.innerHTML += `
             <div>
             <h3>${task.title}</h3>
             <p>${task.description}</p>
+            <div>
             <button class='btn-delete' data-id="${doc.id}">Delete</button>
             <button class='btn-edit' data-id="${doc.id}">Edit</button>
+            </div>
             </div>
         `;
         });
 
-    tasksContainer.innerHTML = html;
-    const btnDelete = tasksContainer.querySelectorAll('.btn-delete');
-    btnDelete.forEach(btn => {
-        btn.addEventListener('click', ({target: {dataset}}) => {
-            deleteTask(dataset.id);
+
+        const btnDelete = tasksContainer.querySelectorAll('.btn-delete');
+        btnDelete.forEach((btn) =>
+            btn.addEventListener('click', async ({ target: { dataset } }) => {
+                try {
+                    await deleteTask(dataset.id);
+                } catch (error) {
+                    console.log(error);
+                }
+            })
+        );
+
+        const btnsEdit = tasksContainer.querySelectorAll(".btn-edit");
+        btnsEdit.forEach((btn) => {
+            btn.addEventListener("click", async (e) => {
+                try {
+                    const doc = await getTask(e.target.dataset.id);
+                    const task = doc.data();
+                    taskForm["task-title"].value = task.title;
+                    taskForm["task-description"].value = task.description;
+
+                    editStatus = true;
+                    id = doc.id;
+                    taskForm["btn-task-form"].innerText = "Update";
+                } catch (error) {
+                    console.log(error);
+                }
+            });
         });
     });
-
-    const btnsEdit = tasksContainer.querySelectorAll(".btn-edit");
-    btnsEdit.forEach((btn) => {
-      btn.addEventListener("click", async (e) => {
-        try {
-          const doc = await getTask(e.target.dataset.id);
-          const task = doc.data();
-          taskForm["task-title"].value = task.title;
-          taskForm["task-description"].value = task.description;
-
-          editStatus = true;
-          id = doc.id;
-          taskForm["btn-task-form"].innerText = "Update";
-        } catch (error) {
-          console.log(error);
-        }
-      });
-    });
-  });
 });
 
-taskForm.addEventListener('submit', (e) => {
+taskForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     console.log('Submitted');
 
-    const title = taskForm['task-title'];
-    const description = taskForm['task-description'];
+    const title = taskForm["task-title"];
+    const description = taskForm["task-description"];
 
-    saveTask(title.value, description.value);
+    try {
+        if (!editStatus) {
+            await saveTask(title.value, description.value);
+        } else {
+            await updateTask(id, {
+                title: title.value,
+                description: description.value,
+            });
 
-    taskForm.reset();
+            editStatus = false;
+            id = "";
+            taskForm["btn-task-form"].innerText = "Save";
+        }
+
+        taskForm.reset();
+        title.focus();
+    } catch (error) {
+        console.log(error);
+    }
 });
