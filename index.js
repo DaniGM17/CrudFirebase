@@ -1,85 +1,86 @@
-import { saveTask, getTasks, onGetTasks, deleteTask, getTask, updateTask } from './firebase.js';
+import {
+    saveTask,
+    getTasks,
+    onGetTasks,
+    deleteTask,
+    getTask,
+    updateTask
+} from './firebase.js';
 
 const taskForm = document.getElementById('task-form');
-const tasksContainer = document.getElementById('tasks-container');
+const taskContainer = document.getElementById('task-container');
 
 let editStatus = false;
-let id = "";
+let id = '';
 
-window.addEventListener('DOMContentLoaded', async (e) => {
+window.addEventListener('DOMContentLoaded', async () => {
     onGetTasks((querySnapshot) => {
-        tasksContainer.innerHTML = '';
+       let html = '';
 
-        querySnapshot.forEach((doc) => {
+        querySnapshot.forEach(doc => {
             const task = doc.data();
-            tasksContainer.innerHTML += `
+            html += `
+            <div class='card card-body mt-2 bord-primary'>
+            <h3 class='card-title'>${task.title}</h3>
+            <p class='card-text'>${task.description}</p>
             <div>
-            <h3>${task.title}</h3>
-            <p>${task.description}</p>
-            <div>
-            <button class='btn-delete' data-id="${doc.id}">Delete</button>
-            <button class='btn-edit' data-id="${doc.id}">Edit</button>
+            <button class='btn-delete btn btn-primary btn-sm' data-id="${doc.id}">Delete</button>
+            <button class='btn-edit btn btn-secondary btn-sm' data-id="${doc.id}">Edit</button>
             </div>
             </div>
         `;
         });
+        taskContainer.innerHTML = html;
 
-
-        const btnDelete = tasksContainer.querySelectorAll('.btn-delete');
-        btnDelete.forEach((btn) =>
+        const btnDelete = taskContainer.querySelectorAll('.btn-delete');
+        btnDelete.forEach(btn => {
             btn.addEventListener('click', async ({ target: { dataset } }) => {
-                try {
-                    await deleteTask(dataset.id);
-                } catch (error) {
-                    console.log(error);
-                }
+                deleteTask(dataset.id);
             })
-        );
-
-        const btnsEdit = tasksContainer.querySelectorAll(".btn-edit");
-        btnsEdit.forEach((btn) => {
-            btn.addEventListener("click", async (e) => {
-                try {
-                    const doc = await getTask(e.target.dataset.id);
-                    const task = doc.data();
-                    taskForm["task-title"].value = task.title;
-                    taskForm["task-description"].value = task.description;
-
-                    editStatus = true;
-                    id = doc.id;
-                    taskForm["btn-task-form"].innerText = "Update";
-                } catch (error) {
-                    console.log(error);
-                }
-            });
         });
+
+        const btnsEdit = taskContainer.querySelectorAll('.btn-edit');
+        btnsEdit.forEach((btn) => {
+            btn.addEventListener('click', async (e) => {
+                const doc = await getTask(e.target.dataset.id);
+                const task = doc.data();
+
+                taskForm['task-title'].value = task.title;
+                taskForm['task-description'].value = task.description;
+
+                editStatus = true;
+                id = e.target.dataset.id;
+
+                taskForm['btn-task-form'].innerText = 'update';
+            })
+        })
+
+        console.log(btnDelete);
     });
+
 });
 
-taskForm.addEventListener('submit', async (e) => {
+
+taskForm.addEventListener('submit', (e) => {
     e.preventDefault();
     console.log('Submitted');
 
-    const title = taskForm["task-title"];
-    const description = taskForm["task-description"];
+    const title = taskForm['task-title'];
+    const description = taskForm['task-description'];
 
-    try {
-        if (!editStatus) {
-            await saveTask(title.value, description.value);
-        } else {
-            await updateTask(id, {
-                title: title.value,
-                description: description.value,
-            });
+    if (!editStatus) {
+        saveTask(title.value, description.value);
+    } else {
+        updateTask(id, {
+            title: title.value,
+            description: description.value,
+        });
+        console.log('its me... I am problem')
 
-            editStatus = false;
-            id = "";
-            taskForm["btn-task-form"].innerText = "Save";
-        }
+        editStatus = false;
 
-        taskForm.reset();
-        title.focus();
-    } catch (error) {
-        console.log(error);
     }
+
+    taskForm.reset();
+
 });

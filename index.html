@@ -1,24 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://bootswatch.com/5/quartz/bootstrap.min.css">
     <title>Firebase CRUD</title>
 </head>
+
 <body>
-    <form id="task-form">
-        <label for="Title">Title</label>
-        <input type="text" placeholder="Task Title" id="task-title">
+    <div class="container p-4">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card-body">
+                    <h1 class="h4">Add Taks</h1>
+                    <form id="task-form">
+                        <div>
+                            <label for="Title" class="form-label">Title</label>
+                            <input class="form-control mb-3" type="text" placeholder="Task Title" id="task-title">
+                        </div>
+                        <div class="mb-3">
 
-        <label for="description">Description</label>
-        <textarea id="task-description" rows="3" placeholder="Task Description"></textarea>
+                            <label for="description" class="form-label">Description</label>
 
-        <button id="btn-task-save">Save</button>
-    </form>
+                            <textarea class="form-control mb-3" id="task-description" rows="3"
+                                placeholder="Task Description"></textarea>
+                        </div>
+                        <button class="btn btn-outline-primary" id="btn-task-save">Save</button>
 
-    <div id="tasks-container"></div>
+                    </form>
+                </div>
+            </div>
+          <div class="col-md-6" id="task-container"></div>
 
     <script type="module" src="./index.js"></script>
 </body>
+
 </html>
