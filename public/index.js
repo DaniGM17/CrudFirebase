@@ -39,9 +39,9 @@ window.addEventListener('DOMContentLoaded', async () => {
             })
         });
 
-        const btnsEdit = taskContainer.querySelectorAll('.btn-edit');
-        btnsEdit.forEach((btn) => {
-            btn.addEventListener('click', async (e) => {
+        //const btnsEdit = taskContainer.querySelectorAll('.btn-edit');
+        taskContainer.addEventListener('click', async e => {
+            if(e.target.classList.contains('btn-edit')){
                 const doc = await getTask(e.target.dataset.id);
                 const task = doc.data();
 
@@ -51,11 +51,24 @@ window.addEventListener('DOMContentLoaded', async () => {
                 editStatus = true;
                 id = e.target.dataset.id;
 
-                taskForm['btn-task-form'].innerText = 'update';
-            })
+                taskForm['btn-task-save'].innerText = 'update';
+            }
         })
+        // btnsEdit.forEach((btn) => {
+        //     btn.addEventListener('click', async (e) => {
+        //         const doc = await getTask(e.target.dataset.id);
+        //         const task = doc.data();
 
-        console.log(btnDelete);
+        //         taskForm['task-title'].value = task.title;
+        //         taskForm['task-description'].value = task.description;
+
+        //         editStatus = true;
+        //         id = e.target.dataset.id;
+
+        //         taskForm['btn-task-form'].innerText = 'update';
+        //     })
+        // })
+
     });
 
 });
