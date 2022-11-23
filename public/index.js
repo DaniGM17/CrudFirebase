@@ -4,7 +4,8 @@ import {
     onGetTasks,
     deleteTask,
     getTask,
-    updateTask
+    updateTask,
+    saveImage
 } from './firebase.js';
 
 const taskForm = document.getElementById('task-form');
@@ -12,6 +13,11 @@ const taskContainer = document.getElementById('task-container');
 
 let editStatus = false;
 let id = '';
+
+const uploadFileAction = (e) => {
+    const file = e.target.files[0];
+    saveImage(file);
+}
 
 window.addEventListener('DOMContentLoaded', async () => {
     onGetTasks((querySnapshot) => {
@@ -71,7 +77,11 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     });
 
+    document.querySelector('#file-task').addEventListener('change', uploadFileAction);
+
 });
+
+
 
 
 taskForm.addEventListener('submit', (e) => {
@@ -97,3 +107,4 @@ taskForm.addEventListener('submit', (e) => {
     taskForm.reset();
 
 });
+
