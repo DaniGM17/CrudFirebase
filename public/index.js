@@ -16,7 +16,10 @@ let id = '';
 
 const uploadFileAction = (e) => {
     const file = e.target.files[0];
-    saveImage(file);
+    if(file.type.includes('image')){
+        console.log('Sí es una imagen');
+        saveImage(file);
+    }
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
