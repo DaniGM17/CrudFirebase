@@ -16,7 +16,7 @@ let id = '';
 
 const uploadFileAction = (e) => {
     const file = e.target.files[0];
-    if(file.type.includes('image')){
+    if (file.type.includes('image')) {
         console.log('Sí es una imagen');
         saveImage(file);
     }
@@ -24,7 +24,7 @@ const uploadFileAction = (e) => {
 
 window.addEventListener('DOMContentLoaded', async () => {
     onGetTasks((querySnapshot) => {
-       let html = '';
+        let html = '';
 
         querySnapshot.forEach(doc => {
             const task = doc.data();
@@ -50,7 +50,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
         //const btnsEdit = taskContainer.querySelectorAll('.btn-edit');
         taskContainer.addEventListener('click', async e => {
-            if(e.target.classList.contains('btn-edit')){
+            if (e.target.classList.contains('btn-edit')) {
                 const doc = await getTask(e.target.dataset.id);
                 const task = doc.data();
 
@@ -91,23 +91,26 @@ taskForm.addEventListener('submit', (e) => {
     e.preventDefault();
     console.log('Submitted');
 
-    const title = taskForm['task-title'];
-    const description = taskForm['task-description'];
+    const title = taskForm['task-title'].value;
+    const description = taskForm['task-description'].value;
 
-    if (!editStatus) {
-        saveTask(title.value, description.value);
+    if (title.length > 3 || description.length > 3){
+        if (!editStatus) {
+            saveTask(title, description);
+        } else {
+            updateTask(id, {
+                'title': title,
+                'description': description,
+            });
+            editStatus = false;
+            document.querySelector('#btn-task-save').
+            innerText='Save';
+        }
+        taskForm.reset();
     } else {
-        updateTask(id, {
-            title: title.value,
-            description: description.value,
-        });
-        console.log('its me... I am problem')
-
-        editStatus = false;
-
+        alert('Debes escribir algo 😑');
     }
-
-    taskForm.reset();
+    
 
 });
 
