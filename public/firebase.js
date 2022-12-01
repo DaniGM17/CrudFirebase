@@ -13,7 +13,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-firestore.js";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
-import { getStorage, ref,uploadBytes, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-storage.js"
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-storage.js"
 // Your web app's Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyCic9rtMLKkGUiImKzFU5iwmVWgnlBpG6E",
@@ -29,11 +29,11 @@ const app = initializeApp(firebaseConfig);
 
 const db = getFirestore();
 
-const storage = getStorage();
+const storage = getStorage(app);
 
 
-export const saveTask = (title, description) => {
-    addDoc(collection(db, 'tasks'), { title, description });
+export const saveTask = (title, description, imageUrl) => {
+    addDoc(collection(db, 'tasks'), { title, description, imageUrl });
 }
 
 export const getTasks = () => getDocs(collection(db, 'tasks'));
@@ -48,12 +48,11 @@ export const updateTask = (id, newFields) =>
     updateDoc(doc(db, "tasks", id), newFields);
 
 export const saveImage = file => {
-    console.log(file);
-    const storageRef = ref(storage, `images/${file.name}`);
+  const storageRef = ref(storage, `images/${file.name}`);
+  const uploadTask = uploadBytesResumable(storageRef, file);
 
 
-    const uploadTask = uploadBytesResumable(storageRef, file);
-
+   
     // Register three observers:
     // 1. 'state_changed' observer, called any time the state changes
     // 2. Error observer, called on failure
